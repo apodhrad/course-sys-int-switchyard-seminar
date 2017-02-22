@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.redhat.brq.integration</groupId>
-  <artifactId>switchyard-seminar-lab00</artifactId>
+  <artifactId>switchyard-seminar-lab01</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>bundle</packaging>
   <name>com.redhat.brq.integration:switchyard-seminar</name>
