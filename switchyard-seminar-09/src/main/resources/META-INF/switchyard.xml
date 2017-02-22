@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sy:switchyard xmlns:bean="urn:switchyard-component-bean:config:2.0" xmlns:file="urn:switchyard-component-camel-file:config:2.0" xmlns:jms="urn:switchyard-component-camel-jms:config:2.0" xmlns:resteasy="urn:switchyard-component-resteasy:config:2.0" xmlns:sca="http://docs.oasis-open.org/ns/opencsa/sca/200912" xmlns:sy="urn:switchyard-config:switchyard:2.0" xmlns:transform="urn:switchyard-config:transform:2.0" name="switchyard-seminar" targetNamespace="urn:switchyard-seminar:1.0">
+  <sca:composite name="switchyard-seminar" targetNamespace="urn:switchyard-seminar:1.0">
+    <sca:reference name="AccountingService" multiplicity="0..1" promote="ShopServiceBean/AccountingService">
+      <sca:interface.java interface="switchyard_seminar.accounting.AccountingService"/>
+      <resteasy:binding.rest name="rest1">
+        <resteasy:interfaces>switchyard_seminar.accounting.AccountingServiceResource</resteasy:interfaces>
+        <resteasy:address>https://localhost:7171</resteasy:address>
+        <resteasy:basic>
+          <resteasy:user>admin</resteasy:user>
+          <resteasy:password>foo</resteasy:password>
+          <resteasy:host>localhost</resteasy:host>
+          <resteasy:port>7171</resteasy:port>
+        </resteasy:basic>
+      </resteasy:binding.rest>
+    </sca:reference>
+    <sca:component name="ShopServiceBean">
+      <bean:implementation.bean class="switchyard_seminar.ShopServiceBean"/>
+      <sca:service name="ShopService">
+        <sca:interface.java interface="switchyard_seminar.ShopService"/>
+      </sca:service>
+      <sca:reference name="AccountingService">
+        <sca:interface.java interface="switchyard_seminar.accounting.AccountingService"/>
+      </sca:reference>
+      <sca:reference name="OrderStatusService">
+        <sca:interface.java interface="switchyard_seminar.OrderStatusService"/>
+      </sca:reference>
+      <sca:reference name="InventoryRequestService">
+        <sca:interface.java interface="switchyard_seminar.inventory.InventoryRequestService"/>
+      </sca:reference>
+      <sca:reference name="ShipmentService">
+        <sca:interface.java interface="switchyard_seminar.shipment.ShipmentService"/>
+      </sca:reference>
+    </sca:component>
+    <sca:component name="OrderStatusServiceBean">
+      <bean:implementation.bean class="switchyard_seminar.OrderStatusServiceBean"/>
+      <sca:service name="OrderStatusService">
+        <sca:interface.java interface="switchyard_seminar.OrderStatusService"/>
+      </sca:service>
+    </sca:component>
+    <sca:reference name="InventoryInboxService" multiplicity="0..1" promote="ShopServiceBean/InventoryRequestService">
+      <sca:interface.java interface="switchyard_seminar.inventory.InventoryInboxService"/>
+      <file:binding.file name="file1">
+        <file:messageComposer class="switchyard_seminar.inventory.InventoryMessageComposer"/>
+        <file:directory>${sys.base}/target/inbox/inventory</file:directory>
+        <file:produce/>
+      </file:binding.file>
+    </sca:reference>
+    <sca:component name="InventoryResponseServiceBean">
+      <bean:implementation.bean class="switchyard_seminar.inventory.InventoryResponseServiceBean"/>
+      <sca:service name="InventoryResponseService">
+        <sca:interface.java interface="switchyard_seminar.inventory.InventoryResponseService"/>
+      </sca:service>
+      <sca:reference name="OrderStatusService">
+        <sca:interface.java interface="switchyard_seminar.OrderStatusService"/>
+      </sca:reference>
+    </sca:component>
+    <sca:service name="InventoryOutboxService" promote="InventoryResponseServiceBean/InventoryResponseService">
+      <sca:interface.java interface="switchyard_seminar.inventory.InventoryOutboxService"/>
+      <file:binding.file name="file1">
+        <file:messageComposer class="switchyard_seminar.inventory.InventoryMessageComposer"/>
+        <file:directory>${sys.base}/target/outbox/inventory</file:directory>
+        <file:consume/>
+      </file:binding.file>
+    </sca:service>
+    <sca:reference name="ShipmentServicePortType" multiplicity="0..1" promote="ShopServiceBean/ShipmentService">
+      <sca:interface.wsdl interface="ShipmentServiceWrapped.wsdl#wsdl.porttype(ShipmentServicePortType)"/>
+      <jms:binding.jms name="jms.req">
+        <jms:queue>SHPMnT.REQ</jms:queue>
+        <jms:connectionFactory>#ConnectionFactory</jms:connectionFactory>
+      </jms:binding.jms>
+    </sca:reference>
+  </sca:composite>
+  <sy:transforms>
+    <transform:transform.jaxb from="java:switchyard_seminar.model.Address" to="{urn:switchyard-seminar:1.0}delivery" enableAttachment="false" enableXOPPackage="true"/>
+  </sy:transforms>
+  <sy:domain>
+    <sy:properties load="service.properties">
+      <sy:property name="org.switchyard.handlers.messageTrace.enabled" value="true"/>
+    </sy:properties>
+  </sy:domain>
+</sy:switchyard>
