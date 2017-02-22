@@ -20,6 +20,8 @@ osgi.extender; filter:="(osgi.extender=pax.cdi)"</switchyard.osgi.require.capabi
     <switchyard.osgi.symbolic.name>com.redhat.brq.integration.switchyard.switchyard-seminar-09</switchyard.osgi.symbolic.name>
     <switchyard.osgi.dynamic>org.switchyard,org.switchyard.*</switchyard.osgi.dynamic>
     <maven.compiler.source>1.7</maven.compiler.source>
+    <integration.version></integration.version>
+    <kie.version></kie.version>
   </properties>
   <dependencyManagement>
     <dependencies>
@@ -90,6 +92,10 @@ osgi.extender; filter:="(osgi.extender=pax.cdi)"</switchyard.osgi.require.capabi
       <artifactId>activemq-all</artifactId>
       <version>5.11.0.redhat-630187</version>
       <scope>test</scope>
+    </dependency>
+    <dependency>
+    	<groupId>org.switchyard.components</groupId>
+    	<artifactId>switchyard-component-camel</artifactId>
     </dependency>
   </dependencies>
   <build>

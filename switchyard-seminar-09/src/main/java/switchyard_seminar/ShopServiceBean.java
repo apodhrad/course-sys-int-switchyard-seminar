@@ -12,7 +12,7 @@ import switchyard_seminar.accounting.AccountingService;
 import switchyard_seminar.inventory.InventoryRequest;
 import switchyard_seminar.model.Order;
 import switchyard_seminar.model.OrderStatus;
-import switchyard_seminar.shipment.ShipmentService;
+import switchyard_seminar.shipment.ShipmentRequestService;
 
 @Service(ShopService.class)
 public class ShopServiceBean implements ShopService {
@@ -33,8 +33,8 @@ public class ShopServiceBean implements ShopService {
 	OrderStatusService orderStatusService;
 
 	@Inject
-	@Reference
-	ShipmentService shipmentService;
+	@Reference("ShipmentRequestService")
+	ReferenceInvoker shipmentService;
 
 	@Override
 	public String submitOrder(Order order) throws Exception {
@@ -51,9 +51,9 @@ public class ShopServiceBean implements ShopService {
 		orderStatus.setInvoiceId(accountResponse.getInvoiceId());
 		orderStatus.setInvoiceStatus(accountResponse.getStatus());
 		orderStatusService.save(orderStatus);
-		
+
 		// Deliver the order
-		shipmentService.delivery(order.getAddress());
+		shipmentService.newInvocation().setProperty("orderId", Long.toString(order.getId())).invoke(order.getAddress());
 
 		return null;
 	}
