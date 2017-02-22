@@ -68,10 +68,14 @@
       <sca:service name="ShipmentResponseService">
         <sca:interface.java interface="switchyard_seminar.shipment.ShipmentResponseService"/>
       </sca:service>
+      <sca:reference name="OrderStatusService">
+        <sca:interface.java interface="switchyard_seminar.OrderStatusService"/>
+      </sca:reference>
     </sca:component>
     <sca:service name="ShipmentResponseServicePortType" promote="ShipmentResponseServiceBean/ShipmentResponseService">
       <sca:interface.wsdl interface="ShipmentResponseService.wsdl#wsdl.porttype(ShipmentResponseServicePortType)"/>
       <jms:binding.jms name="jms.resp">
+        <jms:messageComposer class="switchyard_seminar.shipment.ShipmentMessageComposer"/>
         <jms:queue>SHPMNT.RESP</jms:queue>
         <jms:connectionFactory>#ConnectionFactory</jms:connectionFactory>
       </jms:binding.jms>

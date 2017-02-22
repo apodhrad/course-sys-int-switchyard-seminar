@@ -53,6 +53,7 @@ public class ShopServiceTest {
 		OrderStatus orderStatus = orderStatusService.operation("find").sendInOut(1l).getContent(OrderStatus.class);
 		Assert.assertEquals("ISSUED", orderStatus.getInvoiceStatus());
 		Assert.assertEquals("OK", orderStatus.getInventoryStatus());
+		Assert.assertEquals("OK", orderStatus.getShipmentStatus());
 	}
 
 }
